@@ -2,8 +2,7 @@ const request = require('request')
 const debug = require('debug')('app:github')
 const fs = require('fs')
 
-
-const config = require('./config.js')
+const config = require('./config.json')
 
 const {
   // Year in which the github account is created
@@ -16,18 +15,17 @@ const {
   access_token: accessToken
 } = config
 
-
 // A util helper to calculate the number of pages required for fetching all results
 function numberOfPages (totalPages, perPage) {
-  return Math.floor(totalPages / perPage)
+  return Math.ceil(totalPages / perPage)
 }
 
 // Fetch the users data from a particular country
 function fetchUsersFromCountry (country, page) {
   const startYear = year
   const endYear = year + 1
-  const url = `https://api.github.com/search/users?q=location:${country} created:${startYear}-01-01..${endYear}-01-01&page=${page}`
-
+  const url = `https://api.github.com/search/users?q=location:${country} created:${startYear}-06-01..${endYear}-01-01&page=${page}`
+  console.log('url =>', url)
   return new Promise((resolve, reject) => {
     request({
       url,
@@ -40,7 +38,7 @@ function fetchUsersFromCountry (country, page) {
       if (!error && response.statusCode === 200) {
         resolve(body)
       } else {
-        debug(`error fetching data user ${body}`)
+        debug(`error fetching data user ${JSON.stringify(body || error)}`)
         reject(error)
       }
     })
@@ -55,24 +53,25 @@ fetchUsersFromCountry(country, 1).then((data) => {
   debug(`Scraping data from ${pages} pages`)
 
   const mapPromises = Array(pages).fill(0).map((_, index) => {
-    // debug(`At page ${index}`)
-    return fetchUsersFromCountry(country, index)
+    debug(`At page ${index}`)
+    return fetchUsersFromCountry(country, index + 1)
   })
   debug(`${mapPromises.length} items to fetch`)
 
   return Promise.all(mapPromises).then((data) => {
     let users = []
-
     debug('Fetching users')
     data.forEach((d) => {
       users = users.concat(d.items)
       debug(`Constructing user array => ${users.length} users total`)
     })
-    return writeToJson(`${year}.json`, users)
+    return writeToJson(`${year}-2.json`, users)
   }).then((success) => {
     if (success) {
       debug('Successfully wrote to file')
     }
+  }).catch((error) => {
+    debug(`An error has occured: ${error}`)
   })
 }).catch((error) => {
   debug(`An error has occured: ${error}`)
