@@ -15,3 +15,10 @@ The folder `data/search` contains the data from the Github's Search API. It cont
 The folder `data/user` contains the data of the users from the Github's User API endpoint. It has additional field compared to the results from the Github's Search API.
 
 The folder `data/repo` contains the data for each user's repositories.
+
+
+### Cli
+Contains cli tools
+
+You can recognize it by the shebang `#! /usr/bin/env node`
+and also `chmod u+x yourscript`.
