@@ -1,17 +1,22 @@
-const readline = require('readline')
+#!/usr/bin/env node
+// pretty-print.js prints the output of a json file in the terminal
+// usage:
+// From the root folder:
+// $ node util/pretty-print --file config.json
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
+const flags = require('flags')
+const path = require('path')
 
-rl.question('Which file do you want to pretty print?', (fileName) => {
-  if (!fileName) {
-    console.log('We cannot pretty print that...')
-    rl.close()
-    return
+flags.defineString('file', '', 'The path to the file you want to pretty print')
+flags.parse()
+
+try {
+	// Go up one level
+  const filePath = path.join('..', flags.get('file'))
+  const file = require(filePath, null, 2)
+  if (file) {
+    console.log(JSON.stringify(file, null, 2))
   }
-
-  console.log('\n', require(fileName, null, 2), '\n')
-  rl.close()
-})
+} catch (error) {
+  console.log(error)
+}

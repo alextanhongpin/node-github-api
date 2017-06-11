@@ -15,7 +15,7 @@ const margin = {
 const width = svg.attr('width') - margin.left - margin.right
 const height = svg.attr('height') - margin.top - margin.bottom
 
-const x = d3.scaleBand().rangeRound([0, width]).padding(0.1)
+const x = d3.scaleBand().rangeRound([0, width]).padding(0.2)
 const y = d3.scaleLinear().rangeRound([height, 0])
 
 const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`)

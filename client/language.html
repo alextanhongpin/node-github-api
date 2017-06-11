@@ -2,6 +2,16 @@
 <html>
 <head>
 	<title>Top 20 Programming Languages used in Malaysia</title>
+	<style type="text/css">
+		
+		body {
+			font-family: Avenir, Helvetica, Arial;
+
+		}
+		svg {
+			border: 1px solid silver;
+		}
+	</style>
 </head>
 <body>
 
@@ -15,6 +25,7 @@
     <li>only public repos are taken into account (no forked repos)</li>
     <li>Early github accounts does not have the field language exposed in the api, so that is not taken into account</li>
     <li>One repo can have multiple languages (e.g. javascript, html, css)</li>
+    <li>Private repositories are not taken into account</li>
 	</ul>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script type="text/javascript" src="./language.js"></script>

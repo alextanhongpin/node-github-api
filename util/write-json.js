@@ -2,13 +2,12 @@
 //
 // Description: A util to write a javascript object to json file
 
+const { promisify } = require('util')
 const fs = require('fs')
-function writeToJson (name, json) {
-  return new Promise((resolve, reject) => {
-    fs.writeFile(name, JSON.stringify(json), 'utf8', (err) => {
-      err ? reject(err) : resolve(true)
-    })
-  })
+
+function writeToJson (filePath, json) {
+  const options = { encoding: 'utf-8' }
+  return promisify(fs.writeFile)(filePath, JSON.stringify(json), options)
 }
 
 module.exports = writeToJson
