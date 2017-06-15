@@ -19,9 +19,9 @@ svg
 .attr('height', 640)
 
 const margin = {
-  top: 15,
-  right: 100,
-  bottom: 15,
+  top: 45,
+  right: 60,
+  bottom: 45,
   left: 100
 }
 
@@ -43,16 +43,34 @@ color.domain(data.map(d => d.language))
 const g = svg.append('g')
 .attr('transform', `translate(${margin.left},${margin.top})`)
 
-g.append('g')
+const xAxis = g.append('g')
 .attr('class', 'axis is-x')
 .attr('transform', `translate(0, ${height})`)
 .call(d3.axisBottom(x).ticks(5).tickSizeInner([-height]))
+
+const xAxisVerticalLine = xAxis.selectAll('line')
+.attr('stroke', '#DDDDDD')
+
+const xAxisLabel = xAxis.append('text')
+.attr('fill', 'black')
+.attr('font-weight', 'bold')
+.attr('font-size', 16)
+.text('Repos')
+.attr('x', width)
+.attr('y', 30)
 
 const yAxis = g.append('g')
 .attr('class', 'axis is-y')
 .call(d3.axisLeft(y))
 
-console.log(data)
+const yAxisLabel = yAxis.append('text')
+.text('Languages')
+.attr('x', 0)
+.attr('y', -15)
+.attr('fill', 'black')
+.attr('font-weight', 'bold')
+.attr('font-size', 16)
+
 const bars = g.selectAll('.bar')
     .data(data)
     .enter()
@@ -67,13 +85,16 @@ bars.append('rect')
   .delay((d) => x(d.frequency) / 2)
   .attr('width', (d) => x(d.frequency))
   .attr('height', y.bandwidth())
+  .attr('fill', '#326cf8')
+  // .attr('fill', (d) => color(d.frequency))
 
 // Label
 const labels = bars.append('text')
 .attr('x', (d) => x(d.frequency) + 10)
-.attr('y', (d) => y(d.language) + 20)
+.attr('y', (d) => y(d.language) + y.bandwidth() / 2 + 12 / 2)
 .text((d) => d.frequency)
 .attr('fill', 'white')
 .transition()
 .delay(250)
 .attr('fill', 'black')
+.attr('font-size', 12)
