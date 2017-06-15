@@ -12,11 +12,16 @@ console.log('Total languages', raw_data.length)
 
 // SVG
 
-const svg = d3.select('body').append('svg')
-
+const svg = d3.select('#d3').append('svg')
+const svgPadding = 20
+const aspectRatio = 16 / 9
+const svgWidth = window.innerWidth - svgPadding
+const svgHeight = svgWidth / aspectRatio
 svg
 .attr('width', 960)
 .attr('height', 640)
+.attr('viewBox', '0 0 960 640')
+.attr('preserveAspectRatio', 'xMidYMid meet')
 
 const margin = {
   top: 45,
@@ -24,6 +29,22 @@ const margin = {
   bottom: 45,
   left: 100
 }
+const tooltip = d3.select('body')
+    .append('div')
+    .attr('class', 'tooltip')
+    .style('text-align', 'center')
+    .style('position', 'absolute')
+    .style('opacity', 0)
+    .style('background', 'rgba(0, 0, 0, .85)')
+    .style('color', 'white')
+    .style('max-width', '240px')
+    .style('height', '30px')
+    .style('font-size', '12px')
+    .style('line-height', '30px')
+    .style('margin-top', '-60px')
+    .style('padding', '0 10px')
+    .style('border-radius', '5px')
+    // .style('margin-top', '-50%')
 
 const width = svg.attr('width') - margin.left - margin.right
 const height = svg.attr('height') - margin.top - margin.bottom
@@ -44,37 +65,68 @@ const g = svg.append('g')
 .attr('transform', `translate(${margin.left},${margin.top})`)
 
 const xAxis = g.append('g')
-.attr('class', 'axis is-x')
-.attr('transform', `translate(0, ${height})`)
-.call(d3.axisBottom(x).ticks(5).tickSizeInner([-height]))
+  .attr('class', 'axis is-x')
+  .attr('transform', `translate(0, ${height})`)
+  .call(d3.axisBottom(x).ticks(5).tickSizeInner([-height]))
 
 const xAxisVerticalLine = xAxis.selectAll('line')
 .attr('stroke', '#DDDDDD')
 
 const xAxisLabel = xAxis.append('text')
-.attr('fill', 'black')
-.attr('font-weight', 'bold')
-.attr('font-size', 16)
-.text('Repos')
-.attr('x', width)
-.attr('y', 30)
+  .attr('fill', 'black')
+  .attr('font-weight', 'bold')
+  .attr('font-size', 16)
+  .text('Repos')
+  .attr('x', width)
+  .attr('y', 30)
 
 const yAxis = g.append('g')
-.attr('class', 'axis is-y')
-.call(d3.axisLeft(y))
+  .attr('class', 'axis is-y')
+  .call(d3.axisLeft(y))
 
 const yAxisLabel = yAxis.append('text')
-.text('Languages')
-.attr('x', 0)
-.attr('y', -15)
-.attr('fill', 'black')
-.attr('font-weight', 'bold')
-.attr('font-size', 16)
+  .text('Languages')
+  .attr('x', 0)
+  .attr('y', -15)
+  .attr('fill', 'black')
+  .attr('font-weight', 'bold')
+  .attr('font-size', 16)
 
+let timeout = null
 const bars = g.selectAll('.bar')
-    .data(data)
-    .enter()
-    .append('g')
+  .data(data)
+  .enter()
+  .append('g')
+  .on('mouseover', function (d) {
+    // d3.select(this).style('opacity', 0.5)
+    // if (timeout) {
+    //   window.clearTimeout(timeout)
+    // }
+
+    const len = [d.frequency, d.language, 'repos found'].join(' ').length
+    tooltip
+    .style('width', (len * 8) + 'px')
+    .style('margin-left', (-len * 4) + 'px')
+  })
+  .on('mousemove', function (d) {
+    if (timeout) {
+      window.clearTimeout(timeout)
+    }
+    tooltip
+    .style('left', d3.event.pageX + 'px')
+    .style('top', d3.event.pageY + 'px')
+    .style('opacity', 1)
+    .html([d.frequency, d.language, 'repos found'].join(' '))
+  })
+  .on('mouseout', function () {
+    d3.select(this).style('opacity', 1)
+    if (timeout) {
+      window.clearTimeout(timeout)
+    }
+    timeout = window.setTimeout(() => {
+      tooltip.transition().duration(150).style('opacity', 0)
+    }, 250)
+  })
 
 bars.append('rect')
   .attr('class', 'bar')
@@ -86,15 +138,16 @@ bars.append('rect')
   .attr('width', (d) => x(d.frequency))
   .attr('height', y.bandwidth())
   .attr('fill', '#326cf8')
+
   // .attr('fill', (d) => color(d.frequency))
 
 // Label
 const labels = bars.append('text')
-.attr('x', (d) => x(d.frequency) + 10)
-.attr('y', (d) => y(d.language) + y.bandwidth() / 2 + 12 / 2)
-.text((d) => d.frequency)
-.attr('fill', 'white')
-.transition()
-.delay(250)
-.attr('fill', 'black')
-.attr('font-size', 12)
+  .attr('x', (d) => x(d.frequency) + 10)
+  .attr('y', (d) => y(d.language) + y.bandwidth() / 2 + 12 / 2)
+  .text((d) => d.frequency)
+  .attr('fill', 'white')
+  .transition()
+  .delay(250)
+  .attr('fill', 'black')
+  .attr('font-size', 12)
