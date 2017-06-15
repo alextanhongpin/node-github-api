@@ -98,7 +98,7 @@ const bars = g.selectAll('.bar')
   .enter()
   .append('g')
   .on('mouseover', function (d) {
-    // d3.select(this).style('opacity', 0.5)
+    d3.select(this).select('rect').attr('fill', '#FF4444').style('opacity', 0.75)
     // if (timeout) {
     //   window.clearTimeout(timeout)
     // }
@@ -119,7 +119,7 @@ const bars = g.selectAll('.bar')
     .html([d.frequency, d.language, 'repos found'].join(' '))
   })
   .on('mouseout', function () {
-    d3.select(this).style('opacity', 1)
+    d3.select(this).select('rect').attr('fill', '#326cf8').style('opacity', 1)
     if (timeout) {
       window.clearTimeout(timeout)
     }
